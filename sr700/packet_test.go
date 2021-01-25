@@ -1,4 +1,4 @@
-package main
+package sr700
 
 import (
 	"reflect"
@@ -14,6 +14,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Init,
+				ID:          DefaultID,
 				Flag:        ControllerSent,
 				Control:     Read,
 				Fan:         0x00,
@@ -26,6 +27,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Normal,
+				ID:          DefaultID,
 				Flag:        CurrentSettings,
 				Control:     Read,
 				Fan:         0x09,
@@ -38,6 +40,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Normal,
+				ID:          DefaultID,
 				Flag:        NonTerminalSequenceLine,
 				Control:     Read,
 				Fan:         0x09,
@@ -50,6 +53,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Normal,
+				ID:          DefaultID,
 				Flag:        NonTerminalSequenceLine,
 				Control:     Read,
 				Fan:         0x09,
@@ -62,6 +66,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Normal,
+				ID:          DefaultID,
 				Flag:        TerminalSequenceLine,
 				Control:     Read,
 				Fan:         0x09,
@@ -74,6 +79,7 @@ func TestPacketToBytes(t *testing.T) {
 		{
 			Packet{
 				Header:      Normal,
+				ID:          DefaultID,
 				Flag:        ControllerSent,
 				Control:     Idle,
 				Fan:         0x01,
@@ -90,5 +96,59 @@ func TestPacketToBytes(t *testing.T) {
 		if !reflect.DeepEqual(actual, test.Bytes) {
 			t.Errorf("Packet.Bytes() does not match.\nexpected: %X\n  actual: %X\n\n%v", test.Bytes, actual, test.Packet)
 		}
+	}
+}
+
+func Test_ParsePacket(t *testing.T) {
+	tests := []struct {
+		Bytes  []byte
+		Packet Packet
+	}{
+		{
+			[]byte{0xAA, 0xAA, 0x61, 0x74, 0xA0, 0x00, 0x00, 0x09, 0x14, 0x01, 0x00, 0x00, 0xAA, 0xFA},
+			Packet{
+				Header:      Normal,
+				ID:          DefaultID,
+				Flag:        CurrentSettings,
+				Control:     Read,
+				Fan:         0x09,
+				Timer:       0x14,
+				Heat:        0x01,
+				Temperature: 0x00,
+			},
+		},
+		{
+			[]byte{0xAA, 0xAA, 0x61, 0x74, 0xA0, 0x00, 0x00, 0x09, 0x14, 0x01, 0x01, 0x02, 0xAA, 0xFA},
+			Packet{
+				Header:      Normal,
+				ID:          DefaultID,
+				Flag:        CurrentSettings,
+				Control:     Read,
+				Fan:         0x09,
+				Timer:       0x14,
+				Heat:        0x01,
+				Temperature: 0x0102,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		actual, err := ParsePacket(test.Bytes)
+		if err != nil {
+			t.Errorf("unexpected parse error for %v: %v", test.Bytes, err)
+			continue
+		}
+
+		if actual != test.Packet {
+			t.Errorf("error parsing packet\nexpected: %v\n  actual: %v", test.Packet, actual)
+		}
+	}
+}
+
+func TestBytesToHexString(t *testing.T) {
+	actual := BytesToHexString([]byte{0x00, 0x10, 0x0F, 0x44})
+	expected := "0x00 0x10 0x0F 0x44"
+	if actual != expected {
+		t.Errorf("output did not match\nexpected: %s\n  actual: %s", expected, actual)
 	}
 }

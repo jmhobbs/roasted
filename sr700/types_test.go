@@ -1,4 +1,4 @@
-package main
+package sr700
 
 import (
 	"testing"
@@ -38,6 +38,10 @@ func TestTimerValue(t *testing.T) {
 		actual := test.Timer.Value()
 		if actual != test.Expected {
 			t.Errorf("Value does not match.\nexpected: %v\n  actual: %v", test.Expected, actual)
+		}
+		reverse := NewTimerFromDuration(test.Expected)
+		if reverse != test.Timer {
+			t.Errorf("Error creating Timer from time.Duration.\nexpected: %04x\n  actual: %04x", test.Timer, reverse)
 		}
 	}
 }

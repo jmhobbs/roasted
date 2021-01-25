@@ -1,19 +1,37 @@
-package main
+package sr700
 
-import "time"
+import (
+	"time"
+)
 
 type Speed uint8
 
+func (s Speed) Valid() bool {
+	return s >= 0x01 && s <= 0x09
+}
+
 type Timer uint8
+
+type ID uint16
+
+const (
+	DefaultID ID = 0x6174
+)
 
 func (t Timer) Value() time.Duration {
 	return time.Second * time.Duration(float64(t)/10.0*60.0)
 }
 
+func NewTimerFromDuration(duration time.Duration) Timer {
+	return Timer(duration.Seconds() / 60.0 * 10.0)
+}
+
 type Temperature uint16
 
+const TemperatureBelow150F = 0xFF00
+
 func (t Temperature) Valid() bool {
-	return 0xFF00 != t
+	return TemperatureBelow150F != t
 }
 
 type Header uint16
@@ -47,7 +65,22 @@ type Heat uint8
 
 const (
 	Cool   Heat = 0x00
-	Low    Heat = 0x01
-	Medium Heat = 0x02
-	High   Heat = 0x03
+	Low    Heat = 0x01 // 390F
+	Medium Heat = 0x02 // 455F
+	High   Heat = 0x03 // 490F
 )
+
+var heatNames = map[Heat]string{
+	Cool:   "Cool",
+	Low:    "Low",
+	Medium: "Medium",
+	High:   "High",
+}
+
+func (h Heat) String() string {
+	s, ok := heatNames[h]
+	if ok {
+		return s
+	}
+	return "Invalid"
+}
