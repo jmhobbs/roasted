@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jacobsa/go-serial/serial"
+	"github.com/jmhobbs/roasted/pkg"
 	"github.com/jmhobbs/roasted/sr700"
 )
 
@@ -16,7 +17,7 @@ func main() {
 	)
 	flag.Parse()
 
-	recipe, err := LoadSimpleRecipe(flag.Arg(0))
+	recipe, err := pkg.LoadSimpleRecipe(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
 	}
