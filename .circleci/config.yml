@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: cimg/go:1.15
+    steps:
+      - checkout
+      - run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+      - run: bash <(curl -s https://codecov.io/bash)
