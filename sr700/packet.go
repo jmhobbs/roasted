@@ -35,6 +35,17 @@ func (p Packet) String() string {
 	return b.String()
 }
 
+func (p Packet) HumanString() string {
+	return strings.Join([]string{
+		p.Control.String(),
+		p.Flag.String(),
+		p.Fan.String(),
+		p.Timer.Value().String(),
+		p.Heat.String(),
+		fmt.Sprintf("%f F", p.Temperature),
+	}, ", ")
+}
+
 func (p Packet) Bytes() []byte {
 	buf := make([]byte, 14)
 

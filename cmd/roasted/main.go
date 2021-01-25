@@ -14,6 +14,7 @@ func main() {
 	var (
 		device = flag.String("device", "/dev/tty.wchusbserial1410", "SR700 serial device")
 		debug  = flag.Bool("debug", false, "enable debug logging")
+		refreshInterval = flag.Int("refresh", 10, "number of seconds between refreshing")
 	)
 	flag.Parse()
 
@@ -70,9 +71,9 @@ func main() {
 				log.Printf("<- %v F / %d s", temp, secondsRemaining)
 			}
 
-			time.Sleep(time.Second * time.Duration(min(secondsRemaining, 5)))
+			time.Sleep(time.Second * time.Duration(min(secondsRemaining, *refreshInterval)))
 
-			secondsRemaining = secondsRemaining - 5
+			secondsRemaining = secondsRemaining - *refreshInterval
 		}
 	}
 

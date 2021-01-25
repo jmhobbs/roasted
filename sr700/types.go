@@ -1,6 +1,7 @@
 package sr700
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -8,6 +9,10 @@ type Speed uint8
 
 func (s Speed) Valid() bool {
 	return s >= 0x01 && s <= 0x09
+}
+
+func (s Speed) String() string {
+	return fmt.Sprintf("Fan %d", s)
 }
 
 type Timer uint8
@@ -51,6 +56,22 @@ const (
 	CurrentSettings         Flag = 0xA0
 )
 
+var flagNames = map[Flag]string{
+	ControllerSent:          "Controller Sent",
+	RoasterSent:             "Roaster Sent",
+	NonTerminalSequenceLine: "Program Line",
+	TerminalSequenceLine:    "Final Program Line",
+	CurrentSettings:         "Current Settings",
+}
+
+func (f Flag) String() string {
+	s, ok := flagNames[f]
+	if ok {
+		return s
+	}
+	return "Invalid"
+}
+
 type Control uint16
 
 const (
@@ -60,6 +81,22 @@ const (
 	Cooling Control = 0x0404
 	Stop    Control = 0x0801
 )
+
+var controlNames = map[Control]string{
+	Read:    "Read",
+	Idle:    "Idle",
+	Roast:   "Roast",
+	Cooling: "Cooling",
+	Stop:    "Stop",
+}
+
+func (c Control) String() string {
+	s, ok := controlNames[c]
+	if ok {
+		return s
+	}
+	return "Invalid"
+}
 
 type Heat uint8
 
